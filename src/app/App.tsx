@@ -1,3 +1,6 @@
+import image_cropped_circle_image__8__2 from '@/imports/cropped_circle_image__8_-2.png'
+import image_cropped_circle_image__8__1 from '@/imports/cropped_circle_image__8_-1.png'
+import image_cropped_circle_image__7__1 from '@/imports/cropped_circle_image__7_-1.png'
 import image_cropped_circle_image__8_ from '@/imports/cropped_circle_image__8_.png'
 import image_cropped_circle_image__4__8 from '@/imports/cropped_circle_image__4_-8.png'
 import image_cropped_circle_image__4__7 from '@/imports/cropped_circle_image__4_-7.png'
@@ -797,12 +800,12 @@ function HeroSection() {
         className="absolute inset-0 w-full h-full object-cover object-center" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#081A0E]/80 via-[#0C3220]/68 to-[#0C3220]/90" />
 
-      <div className="relative max-w-3xl mx-auto px-4 pt-9 pb-11 md:pt-11 md:pb-14 text-center">
+      <div className="relative max-w-3xl mx-auto px-4 pt-9 pb-11 md:pt-11 md:pb-14 text-center bg-[#0000000a] bg-[#00000000]">
         {/* Identity strip */}
-        <div className="inline-flex items-center gap-2.5 bg-white/8 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-          <ImageWithFallback src={image_cropped_circle_image__8_} alt="UAF" className="w-5 h-5 object-contain flex-shrink-0" />
+        <div className="inline-flex items-center gap-2.5 bg-white/8 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2 mb-6 bg-[#ffffff17] bg-[#ffffff24]">
+          <ImageWithFallback src={image_cropped_circle_image__8__1} alt="UAF" className="w-8 h-8 object-contain flex-shrink-0" />
           <span className="text-white/65 text-[11px] uppercase tracking-[0.2em]" style={mono}>University of Agriculture, Faisalabad</span>
-          <ImageWithFallback src={image_cropped_circle_image__4__5} alt="" className="w-5 h-5 object-contain flex-shrink-0 opacity-70" />
+          <ImageWithFallback src={image_cropped_circle_image__4__5} alt="" className="w-8 h-8 object-contain flex-shrink-0 opacity-70" />
         </div>
 
         <h1 className="text-white text-[2.1rem] md:text-[2.8rem] font-normal mb-2.5 leading-[1.1] tracking-[-0.02em]" style={serif}>
@@ -1811,7 +1814,7 @@ function Footer() {
         <div>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden p-1">
-              <ImageWithFallback src={uafLogo} alt="UAF" className="w-full h-full object-contain" />
+              <ImageWithFallback src={image_cropped_circle_image__8__2} alt="UAF" className="w-full h-full object-contain" />
             </div>
             <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden p-1">
               <ImageWithFallback src={image_cropped_circle_image__4__7} alt="Directorate" className="w-full h-full object-contain" />

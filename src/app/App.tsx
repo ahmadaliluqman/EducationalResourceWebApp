@@ -5,10 +5,11 @@ import image_cropped_circle_image__4_ from '@/imports/cropped_circle_image__4_.p
 import image_images__11_ from '@/imports/images__11_.jfif'
 import image_c622dfef_dcfc_4478_98d3_be10a0d1b704_removalai_preview from '@/imports/c622dfef-dcfc-4478-98d3-be10a0d1b704_removalai_preview.png'
 import image_5a39b444_2011_47bb_9b85_31434046bb7d_removalai_preview from '@/imports/5a39b444-2011-47bb-9b85-31434046bb7d_removalai_preview.png'
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   createBrowserRouter, RouterProvider, Link, Outlet,
   useNavigate, useSearchParams, useOutletContext, useParams,
+  useLocation,
 } from "react-router";
 import {
   Search, Download, Star, Menu, X,
@@ -19,14 +20,15 @@ import {
   FlaskConical, Leaf, BookMarked,
   Layers, Key, LogOut, BarChart3,
   Info, Clock, Package, ArrowRight,
-  Shield, FileDown, Bell, Send,
+  Shield, FileDown, Send,
   MapPin, ExternalLink, ChevronLeft,
+  HelpCircle, AlertCircle, CreditCard, FileQuestion, Bug,
+  Headphones, Zap,
 } from "lucide-react";
 
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 
 import uafLogo      from "@/imports/b2ae3213-6403-4416-9276-625c6925f75e_removalai_preview-3.png";
-import uafLogoColor from "@/imports/WhatsApp_Image_2026-04-24_at_3.25.47_PM.jpeg";
 import dirLogo      from "@/imports/5dfa0e76-f3fb-4592-b4a0-400f557fbb08_removalai_preview-1.png";
 import campusPhoto  from "@/imports/image.png";
 
@@ -63,9 +65,9 @@ interface Resource {
 const CAT_CONFIG: Record<Category, {
   num: string; color: string; bg: string; Icon: React.ElementType; short: string;
 }> = {
-  "Undergraduate Entry Test": { num: "01", color: "#1E3D2F", bg: "#E6EFE9", Icon: GraduationCap, short: "Entry Test"  },
-  "Postgraduate Entry Test":  { num: "02", color: "#1E2F5A", bg: "#E6EAF5", Icon: BookOpen,       short: "Postgrad"   },
-  "Past Papers":              { num: "03", color: "#6B3500", bg: "#F5E9DC", Icon: FileText,        short: "Past Papers"},
+  "Undergraduate Entry Test": { num: "01", color: "#1E3D2F", bg: "#E6EFE9", Icon: GraduationCap, short: "Entry Test"   },
+  "Postgraduate Entry Test":  { num: "02", color: "#1E2F5A", bg: "#E6EAF5", Icon: BookOpen,       short: "Postgrad"    },
+  "Past Papers":              { num: "03", color: "#6B3500", bg: "#F5E9DC", Icon: FileText,        short: "Past Papers" },
   "Student Utilities":        { num: "04", color: "#3D1E6B", bg: "#EDE6F5", Icon: Layers,          short: "Utilities"  },
 };
 
@@ -95,7 +97,7 @@ const SEED: Resource[] = [
     degree: "BS Agriculture Engineering", format: "PDF", type: "paid", price: 499,
     thumbnail: US("1635070041078-e363dbe005cb"),
     rating: 4.9, reviews: 208, downloads: 6820,
-    description: "High-yield solved MCQs, formula sheets and model papers for Pre-Engineering UAF entry test. Covers all topics with step-by-step solutions and exam strategy tips.",
+    description: "High-yield solved MCQs, formula sheets and model papers for Pre-Engineering UAF entry test.",
     highlights: ["1200+ solved MCQs", "Formula condensed sheets", "5 full mock tests", "Gmail delivery within 15 min", "Video solution links"],
     iconKey: "BookOpen", featured: true, isNew: false,
   },
@@ -136,7 +138,7 @@ const SEED: Resource[] = [
     degree: "MPhil / PhD (All Departments)", format: "PDF", type: "paid", price: 799,
     thumbnail: US("1434030216411-0b793f4b4173"),
     rating: 4.9, reviews: 351, downloads: 9800,
-    description: "Most comprehensive GAT General pack — Quantitative, Analytical, Verbal with 10 full mock tests. Trusted by thousands of UAF students who qualified for MPhil and PhD programs.",
+    description: "Most comprehensive GAT General pack — Quantitative, Analytical, Verbal with 10 full mock tests.",
     highlights: ["10 full mock tests", "Section-wise strategy", "2000+ MCQs", "Previous years solved", "English verbal section"],
     iconKey: "BookOpen", featured: true, isNew: false,
   },
@@ -190,7 +192,7 @@ const SEED: Resource[] = [
     driveUrl: "https://drive.google.com/",
     thumbnail: US("1450101499163-c8848c66ca85"),
     rating: 4.4, reviews: 56, downloads: 7800,
-    description: "Complete set of UAF admission forms, NOC templates, scholarship applications and transfer letters. All documents are fully editable and formatted to UAF administrative standards.",
+    description: "Complete set of UAF admission forms, NOC templates, scholarship applications and transfer letters.",
     highlights: ["Admission forms", "Scholarship templates", "NOC & bonafide formats", "Editable DOCX", "Hostel application forms"],
     iconKey: "FileText", featured: false, isNew: false,
   },
@@ -228,6 +230,196 @@ const CATEGORIES: Category[] = [
 const fmt = (n: number) => n >= 1000 ? (n / 1000).toFixed(1) + "k" : String(n);
 const serif: React.CSSProperties = { fontFamily: "'DM Serif Display', serif" };
 const mono:  React.CSSProperties = { fontFamily: "'JetBrains Mono', monospace" };
+
+// ─── Page transition wrapper ──────────────────────────────────────────────────
+function PageTransition({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setVisible(false);
+    const t = requestAnimationFrame(() => { requestAnimationFrame(() => setVisible(true)); });
+    return () => cancelAnimationFrame(t);
+  }, [location.pathname, location.search]);
+
+  return (
+    <div
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(6px)",
+        transition: "opacity 0.22s ease, transform 0.22s ease",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ─── Support Modal ────────────────────────────────────────────────────────────
+const ISSUE_TYPES = [
+  { value: "payment",    label: "Payment / Order Issue",   Icon: CreditCard,    color: "#B8820A" },
+  { value: "delivery",   label: "Delivery Problem",        Icon: FileDown,      color: "#1E2F5A" },
+  { value: "material",   label: "Material Request",        Icon: FileQuestion,  color: "#1E3D2F" },
+  { value: "technical",  label: "Technical Problem",       Icon: Bug,           color: "#6B3500" },
+  { value: "other",      label: "General Enquiry",         Icon: HelpCircle,    color: "#3D1E6B" },
+];
+
+function SupportModal({ onClose }: { onClose: () => void }) {
+  const [step, setStep] = useState<"type" | "form" | "done">("type");
+  const [issueType, setIssueType] = useState("");
+  const [form, setForm] = useState({ name: "", email: "", whatsapp: "", message: "" });
+  const [errs, setErrs] = useState<Record<string, string>>({});
+  const sf = (k: string, v: string) => { setForm(f => ({ ...f, [k]: v })); setErrs(e => ({ ...e, [k]: "" })); };
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!form.name.trim())              e.name = "Required";
+    if (!form.email.trim())             e.email = "Required";
+    if (!/^03\d{9}$/.test(form.whatsapp)) e.whatsapp = "Format: 03XXXXXXXXX";
+    if (!form.message.trim())           e.message = "Please describe the issue";
+    setErrs(e);
+    return !Object.keys(e).length;
+  };
+
+  const selected = ISSUE_TYPES.find(t => t.value === issueType);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-[#DDD8CE]">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-[#0C3220] to-[#1A3D2A] px-6 py-5 flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-white/20">
+              <Headphones className="w-5 h-5 text-[#D4A017]" />
+            </div>
+            <div>
+              <h2 className="text-white text-base font-normal" style={serif}>Student Support</h2>
+              <p className="text-white/45 text-[10px] mt-0.5" style={mono}>UAF Digital Bank Help Desk</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="flex-shrink-0 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+            <X className="w-4 h-4 text-white" />
+          </button>
+        </div>
+
+        {/* Step indicator */}
+        {step !== "done" && (
+          <div className="flex items-center px-6 py-3 border-b border-[#F0EDE6] gap-2">
+            {[{ k: "type", l: "Issue Type" }, { k: "form", l: "Details" }].map(({ k, l }, i) => (
+              <div key={k} className="flex items-center gap-2">
+                {i > 0 && <div className={`w-8 h-px ${step === "form" ? "bg-[#1E3D2F]" : "bg-[#DDD8CE]"}`} />}
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    (step === "type" && k === "type") || (step === "form" && (k === "type" || k === "form"))
+                      ? "bg-[#1E3D2F] text-white"
+                      : "bg-[#F0EDE6] text-[#6B6057]"}`}
+                    style={mono}>{i + 1}</div>
+                  <span className={`text-xs font-medium ${step === k ? "text-[#1E3D2F]" : "text-[#6B6057]"}`}>{l}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Step 1: Issue type selection */}
+        {step === "type" && (
+          <div className="p-5">
+            <p className="text-sm text-[#6B6057] mb-4">What can we help you with?</p>
+            <div className="space-y-2">
+              {ISSUE_TYPES.map(({ value, label, Icon, color }) => (
+                <button key={value} onClick={() => setIssueType(value)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all ${
+                    issueType === value
+                      ? "border-[#1E3D2F] bg-[#E6EFE9]"
+                      : "border-[#DDD8CE] bg-white hover:border-[#1E3D2F]/40 hover:bg-[#F7F5F0]"
+                  }`}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + "18" }}>
+                    <Icon className="w-4 h-4" style={{ color }} />
+                  </div>
+                  <span className="text-sm font-medium text-[#1A2520]">{label}</span>
+                  {issueType === value && <CheckCircle className="w-4 h-4 text-[#1E3D2F] ml-auto flex-shrink-0" />}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => { if (issueType) setStep("form"); }}
+              disabled={!issueType}
+              className="mt-4 w-full bg-[#0C3220] hover:bg-[#0a2819] disabled:opacity-35 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+              Continue <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Step 2: Form */}
+        {step === "form" && (
+          <div className="p-5">
+            {selected && (
+              <div className="flex items-center gap-2 bg-[#F7F5F0] border border-[#DDD8CE] rounded-xl px-3.5 py-2.5 mb-4">
+                <selected.Icon className="w-4 h-4 flex-shrink-0" style={{ color: selected.color }} />
+                <span className="text-sm font-medium text-[#1A2520]">{selected.label}</span>
+                <button onClick={() => setStep("type")} className="ml-auto text-xs text-[#6B6057] underline">Change</button>
+              </div>
+            )}
+            <div className="space-y-3">
+              {[
+                { k: "name",     l: "Your Name",        p: "Muhammad Ali",       t: "text"  },
+                { k: "email",    l: "Email Address",     p: "yourname@gmail.com", t: "email" },
+                { k: "whatsapp", l: "WhatsApp Number",   p: "03001234567",        t: "tel"   },
+              ].map(({ k, l, p, t }) => (
+                <div key={k}>
+                  <label className="block text-xs font-semibold text-[#1A2520] mb-1.5">{l} <span className="text-red-400">*</span></label>
+                  <input type={t} placeholder={p} value={(form as any)[k]} onChange={e => sf(k, e.target.value)}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all ${
+                      errs[k] ? "border-red-300 bg-red-50 focus:ring-red-200" : "border-[#DDD8CE] focus:border-[#1E3D2F] focus:ring-[#1E3D2F]/10"}`} />
+                  {errs[k] && <p className="text-xs text-red-400 mt-1">{errs[k]}</p>}
+                </div>
+              ))}
+              <div>
+                <label className="block text-xs font-semibold text-[#1A2520] mb-1.5">Describe your issue <span className="text-red-400">*</span></label>
+                <textarea rows={3} placeholder="Please describe your issue in detail…"
+                  value={form.message} onChange={e => sf("message", e.target.value)}
+                  className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 resize-none transition-all ${
+                    errs.message ? "border-red-300 bg-red-50" : "border-[#DDD8CE] focus:border-[#1E3D2F] focus:ring-[#1E3D2F]/10"}`} />
+                {errs.message && <p className="text-xs text-red-400 mt-1">{errs.message}</p>}
+              </div>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 mt-3 flex items-center gap-2">
+              <Zap className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+              <p className="text-xs text-amber-800">Our team responds within <strong>1–3 hours</strong> via WhatsApp.</p>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => setStep("type")} className="px-4 py-2.5 border border-[#DDD8CE] rounded-xl text-sm text-[#6B6057] hover:bg-[#F7F5F0]">← Back</button>
+              <button onClick={() => { if (validate()) setStep("done"); }}
+                className="flex-1 bg-[#0C3220] hover:bg-[#0a2819] text-white font-semibold py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                <Send className="w-4 h-4" /> Submit Request
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Done */}
+        {step === "done" && (
+          <div className="p-8 text-center">
+            <div className="w-16 h-16 bg-[#E6EFE9] rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-[#1E3D2F]" />
+            </div>
+            <h3 className="text-xl font-normal text-[#1A2520] mb-2" style={serif}>Request Submitted</h3>
+            <p className="text-sm text-[#6B6057] mb-1">Thanks, <strong>{form.name}</strong>!</p>
+            <p className="text-sm text-[#6B6057] mb-5">{"We'll contact you on WhatsApp within 1–3 hours."}</p>
+            <div className="flex gap-2">
+              <a href={`https://wa.me/923001234567?text=Hi%2C+I+submitted+a+${encodeURIComponent(selected?.label || "support")}+request`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3 rounded-xl text-sm hover:bg-[#1da851] transition-colors">
+                <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+              </a>
+              <button onClick={onClose} className="flex-1 border border-[#DDD8CE] py-3 rounded-xl text-sm text-[#6B6057] hover:bg-[#F7F5F0]">Close</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Stars({ r, sm }: { r: number; sm?: boolean }) {
   const sz = sm ? "w-3 h-3" : "w-4 h-4";
@@ -458,71 +650,111 @@ function ResourceCard({ res, onAccess }: { res: Resource; onAccess: (r: Resource
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 function TopNav() {
-  const [mob, setMob] = useState(false);
+  const [mob, setMob]         = useState(false);
+  const [support, setSupport] = useState(false);
+  const location              = useLocation();
+
+  useEffect(() => { setMob(false); }, [location.pathname, location.search]);
 
   const NAV = [
-    { label: "All Resources", to: "/"                             },
-    { label: "Entry Tests",   to: "/?c=Undergraduate+Entry+Test"  },
-    { label: "Postgrad",      to: "/?c=Postgraduate+Entry+Test"   },
-    { label: "Past Papers",   to: "/?c=Past+Papers"               },
-    { label: "Utilities",     to: "/?c=Student+Utilities"         },
-    { label: "Submit",        to: "/upload"                       },
-    { label: "Contact",       to: "/contact"                      },
+    { label: "Home",        to: "/"                            },
+    { label: "Entry Tests", to: "/?c=Undergraduate+Entry+Test" },
+    { label: "Postgrad",    to: "/?c=Postgraduate+Entry+Test"  },
+    { label: "Past Papers", to: "/?c=Past+Papers"              },
+    { label: "Utilities",   to: "/?c=Student+Utilities"        },
+    { label: "Submit",      to: "/upload"                      },
   ];
 
+  const isActive = (to: string) => {
+    if (to === "/") return location.pathname === "/" && !location.search;
+    return location.pathname + location.search === to || location.search === to.slice(1);
+  };
+
   return (
-    <header className="bg-[#0C3220] sticky top-0 z-40 shadow-xl">
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-[#D4A017] to-transparent" />
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center gap-3 h-14">
-          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-            <div className="w-9 h-9 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden p-1 group-hover:bg-white/15 transition-colors">
-              <ImageWithFallback src={image_cropped_circle_image__4__2} alt="UAF" className="w-full h-full object-contain" />
-            </div>
-            <div className="leading-tight hidden sm:block">
-              <div className="text-white text-sm font-semibold" style={serif}>UAF Digital Bank</div>
-              <div className="text-white/35 text-[8px] uppercase tracking-[0.25em]" style={mono}>Academic Repository</div>
-            </div>
-          </Link>
-
-          <div className="hidden lg:block w-px h-5 bg-white/15 mx-1" />
-
-          <nav className="hidden lg:flex items-center gap-0.5 flex-1">
-            {NAV.map(({ label, to }) => (
-              <Link key={label} to={to}
-                className="px-3 py-1.5 text-xs font-medium text-white/65 hover:text-white hover:bg-white/10 rounded-lg transition-colors whitespace-nowrap">
-                {label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="ml-auto flex items-center gap-2">
-            <a href="https://wa.me/923001234567" target="_blank" rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1da851] text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
-              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-            </a>
-            <Link to="/admin" className="hidden sm:flex items-center text-white/40 hover:text-white/70 text-xs transition-colors p-1.5 rounded-lg hover:bg-white/10">
-              <Key className="w-3.5 h-3.5" />
+    <>
+      <header className="bg-[#0C3220] sticky top-0 z-40 shadow-lg">
+        <div className="h-[2px] bg-gradient-to-r from-transparent via-[#D4A017] to-transparent" />
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center gap-3 h-14">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+              <div className="relative w-8 h-8 flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden group-hover:bg-white/15 transition-colors">
+                  <ImageWithFallback src={image_cropped_circle_image__4__2} alt="UAF" className="w-full h-full object-contain p-0.5" />
+                </div>
+              </div>
+              <div className="hidden sm:block leading-tight">
+                <div className="text-white text-[13px] font-semibold tracking-[-0.01em]" style={serif}>UAF Digital Bank</div>
+                <div className="text-white/30 text-[8px] uppercase tracking-[0.3em]" style={mono}>Academic Repository</div>
+              </div>
             </Link>
-            <button onClick={() => setMob(!mob)}
-              className="lg:hidden p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-              {mob ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
 
-        {mob && (
-          <div className="lg:hidden border-t border-white/10 py-2 pb-3 grid grid-cols-2 gap-0.5">
-            {NAV.map(({ label, to }) => (
-              <Link key={label} to={to} onClick={() => setMob(false)}
-                className="flex items-center px-3 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-                {label}
+            <div className="hidden lg:block w-px h-4 bg-white/15 mx-1" />
+
+            {/* Desktop nav */}
+            <nav className="hidden lg:flex items-center gap-0.5 flex-1 overflow-hidden">
+              {NAV.map(({ label, to }) => (
+                <Link key={label} to={to}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+                    isActive(to)
+                      ? "bg-white/15 text-white"
+                      : "text-white/55 hover:text-white hover:bg-white/8"
+                  }`}>
+                  {label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Right actions */}
+            <div className="ml-auto flex items-center gap-1.5">
+              {/* Support button */}
+              <button onClick={() => setSupport(true)}
+                className="flex items-center gap-1.5 bg-white/8 hover:bg-white/15 border border-white/15 hover:border-white/25 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+                <HelpCircle className="w-3.5 h-3.5 text-[#D4A017]" />
+                <span className="hidden sm:inline">Support</span>
+              </button>
+
+              {/* Admin icon */}
+              <Link to="/admin" className="p-1.5 text-white/30 hover:text-white/60 hover:bg-white/8 rounded-lg transition-colors hidden sm:flex">
+                <Key className="w-3.5 h-3.5" />
               </Link>
-            ))}
+
+              {/* Mobile menu */}
+              <button onClick={() => setMob(!mob)}
+                className="lg:hidden p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                {mob ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-    </header>
+
+          {/* Mobile menu panel */}
+          {mob && (
+            <div className="lg:hidden border-t border-white/8 py-2 pb-3">
+              <div className="grid grid-cols-2 gap-0.5 mb-2">
+                {NAV.map(({ label, to }) => (
+                  <Link key={label} to={to} onClick={() => setMob(false)}
+                    className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      isActive(to) ? "bg-white/15 text-white font-semibold" : "text-white/65 hover:text-white hover:bg-white/10"}`}>
+                    {label}
+                  </Link>
+                ))}
+              </div>
+              <div className="flex gap-2 px-1 pt-2 border-t border-white/8">
+                <button onClick={() => { setMob(false); setSupport(true); }}
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#D4A017]/15 border border-[#D4A017]/30 text-[#D4A017] text-xs font-semibold py-2.5 rounded-lg">
+                  <HelpCircle className="w-4 h-4" /> Get Support
+                </button>
+                <Link to="/admin" onClick={() => setMob(false)}
+                  className="flex items-center justify-center gap-2 border border-white/15 text-white/40 text-xs px-3 py-2.5 rounded-lg">
+                  <Key className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
+      {support && <SupportModal onClose={() => setSupport(false)} />}
+    </>
   );
 }
 
@@ -530,11 +762,17 @@ function TopNav() {
 function HeroSection() {
   const [q, setQ] = useState("");
   const nav = useNavigate();
+  const [sp] = useSearchParams();
+
+  useEffect(() => {
+    const s = sp.get("s") || "";
+    setQ(s);
+  }, [sp]);
 
   const TAGS = [
     { label: "Pre-Medical",     to: "/?c=Undergraduate+Entry+Test" },
     { label: "Pre-Engineering", to: "/?c=Undergraduate+Entry+Test" },
-    { label: "Agri MSc",        to: "/?c=Postgraduate+Entry+Test"  },
+    { label: "GAT / MPhil",     to: "/?c=Postgraduate+Entry+Test"  },
     { label: "Past Papers",     to: "/?c=Past+Papers"              },
     { label: "Free Only",       to: "/?f=free"                     },
   ];
@@ -542,49 +780,48 @@ function HeroSection() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (q.trim()) nav(`/?s=${encodeURIComponent(q.trim())}`);
+    else nav("/");
   };
 
   return (
     <section className="relative overflow-hidden">
       <ImageWithFallback src={campusPhoto} alt="UAF Campus Building"
         className="absolute inset-0 w-full h-full object-cover object-center" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#081A0E]/82 via-[#0C3220]/72 to-[#0C3220]/92" />
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4A017] to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#081A0E]/80 via-[#0C3220]/68 to-[#0C3220]/90" />
 
-      <div className="relative max-w-3xl mx-auto px-4 py-10 md:py-14 text-center">
-        {/* Logos row */}
-        <div className="flex items-center justify-center gap-3 mb-5">
-          <ImageWithFallback src={uafLogo} alt="UAF" className="w-10 h-10 object-contain drop-shadow-lg flex-shrink-0" />
-          <div>
-            <div className="text-[#D4A017] text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5" style={mono}>زرعی یونیورسٹی فیصل آباد</div>
-            <div className="text-white/70 text-[11px] uppercase tracking-[0.18em]" style={serif}>University of Agriculture, Faisalabad</div>
-          </div>
-          <ImageWithFallback src={image_cropped_circle_image__4_} alt="Directorate" className="w-10 h-10 object-contain drop-shadow-lg flex-shrink-0 opacity-80" />
+      <div className="relative max-w-3xl mx-auto px-4 pt-9 pb-11 md:pt-11 md:pb-14 text-center">
+        {/* Identity strip */}
+        <div className="inline-flex items-center gap-2.5 bg-white/8 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+          <ImageWithFallback src={uafLogo} alt="UAF" className="w-5 h-5 object-contain flex-shrink-0" />
+          <span className="text-white/65 text-[11px] uppercase tracking-[0.2em]" style={mono}>University of Agriculture, Faisalabad</span>
+          <ImageWithFallback src={image_cropped_circle_image__4_} alt="" className="w-5 h-5 object-contain flex-shrink-0 opacity-70" />
         </div>
 
-        <h1 className="text-white text-3xl md:text-[2.6rem] font-normal mb-2 leading-tight" style={serif}>UAF Digital Bank</h1>
-        <p className="text-white/50 text-sm md:text-base mb-7 max-w-md mx-auto leading-relaxed">
-          Free past papers, entry test packs &amp; study resources for all UAF programs.
+        <h1 className="text-white text-[2.1rem] md:text-[2.8rem] font-normal mb-2.5 leading-[1.1] tracking-[-0.02em]" style={serif}>
+          Your Academic<br className="hidden sm:block" /> Resource Hub
+        </h1>
+        <p className="text-white/45 text-sm md:text-[15px] mb-7 max-w-sm mx-auto leading-relaxed">
+          Free past papers, entry test packs &amp; study guides for every UAF program.
         </p>
 
         {/* Search bar */}
         <form onSubmit={submit}
-          className="flex rounded-xl overflow-hidden shadow-2xl max-w-xl mx-auto mb-5 border border-white/20 bg-white/8 backdrop-blur-md">
+          className="relative flex rounded-xl overflow-hidden shadow-2xl max-w-lg mx-auto mb-5 border border-white/20 bg-white/8 backdrop-blur-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35 pointer-events-none" />
           <input type="text" value={q} onChange={e => setQ(e.target.value)}
             placeholder="Search notes, past papers, entry test packs…"
-            className="flex-1 px-4 py-3.5 text-sm text-white placeholder-white/40 focus:outline-none bg-transparent min-w-0" />
+            className="flex-1 pl-10 pr-4 py-3.5 text-sm text-white placeholder-white/35 focus:outline-none bg-transparent min-w-0" />
           <button type="submit"
-            className="bg-[#D4A017] hover:bg-[#b8890f] text-[#0C3220] px-5 flex items-center gap-2 text-sm font-bold transition-colors flex-shrink-0">
-            <Search className="w-4 h-4" />
-            <span className="hidden sm:inline">Search</span>
+            className="bg-[#D4A017] hover:bg-[#bb8d11] text-[#0C3220] px-5 flex items-center gap-1.5 text-sm font-bold transition-colors flex-shrink-0 border-l border-white/10">
+            Search
           </button>
         </form>
 
-        {/* Tag pills */}
+        {/* Quick-filter pills */}
         <div className="flex flex-wrap gap-2 justify-center">
           {TAGS.map(({ label, to }) => (
             <Link key={label} to={to}
-              className="text-xs px-3 py-1 rounded-full border border-white/20 bg-white/8 text-white/65 hover:bg-[#D4A017]/20 hover:border-[#D4A017]/50 hover:text-[#D4A017] transition-all backdrop-blur-sm"
+              className="text-[11px] px-3.5 py-1.5 rounded-full border border-white/18 bg-white/6 text-white/60 hover:bg-[#D4A017]/18 hover:border-[#D4A017]/45 hover:text-[#D4A017] transition-all backdrop-blur-sm"
               style={mono}>
               {label}
             </Link>
@@ -592,56 +829,71 @@ function HeroSection() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#F7F5F0] to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#F7F5F0] to-transparent" />
     </section>
   );
 }
 
 // ─── Hub Cards ────────────────────────────────────────────────────────────────
 function HubCards({ resources }: { resources: Resource[] }) {
-  const HUBS: { cat: Category; desc: string; url: string; img: string }[] = [
-    { cat: "Undergraduate Entry Test", url: "/?c=Undergraduate+Entry+Test",
-      desc: "Pre-Medical, Pre-Engineering & ICS MCQ packs and model papers.",
+  const [sp] = useSearchParams();
+  const activeCat = sp.get("c") || "";
+
+  const HUBS: { cat: Category; desc: string; img: string }[] = [
+    { cat: "Undergraduate Entry Test",
+      desc: "Pre-Medical, Pre-Engineering & ICS MCQ packs.",
       img: US("1434030216411-0b793f4b4173", 600, 400) },
-    { cat: "Postgraduate Entry Test", url: "/?c=Postgraduate+Entry+Test",
-      desc: "GAT General/Subject, MScAgri, MPhil & PhD entry test bundles.",
+    { cat: "Postgraduate Entry Test",
+      desc: "GAT General/Subject, MScAgri, MPhil & PhD bundles.",
       img: US("1574943320219-553eb213f72d", 600, 400) },
-    { cat: "Past Papers", url: "/?c=Past+Papers",
-      desc: "Mid-term and final-term past papers — 2018 to 2026.",
+    { cat: "Past Papers",
+      desc: "Mid-term and final-term papers — 2018 to 2026.",
       img: US("1456513080510-7bf3a84b82f8", 600, 400) },
-    { cat: "Student Utilities", url: "/?c=Student+Utilities",
-      desc: "Admission forms, NOC templates, research proposals and campus guides.",
+    { cat: "Student Utilities",
+      desc: "Admission forms, NOC templates, campus guides.",
       img: US("1562774053-701939374585", 600, 400) },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 pt-8 pb-6">
       <SectionHeader title="Browse Collections" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {HUBS.map(({ cat, desc, url, img }) => {
+        {HUBS.map(({ cat, desc, img }) => {
           const cfg   = CAT_CONFIG[cat];
           const Ic    = cfg.Icon;
           const count = resources.filter(r => r.category === cat).length;
+          const active = activeCat === cat;
           return (
-            <Link key={cat} to={url}
-              className="group rounded-xl overflow-hidden border border-[#DDD8CE] hover:shadow-md hover:border-[#B8820A]/40 transition-all flex flex-col">
+            <Link key={cat} to={`/?c=${encodeURIComponent(cat)}`}
+              className={`group rounded-xl overflow-hidden border transition-all flex flex-col ${
+                active
+                  ? "border-[#B8820A] shadow-md ring-2 ring-[#B8820A]/20"
+                  : "border-[#DDD8CE] hover:shadow-md hover:border-[#B8820A]/40"
+              }`}>
               <div className="relative h-28 overflow-hidden flex-shrink-0" style={{ backgroundColor: cfg.bg }}>
                 <ImageWithFallback src={img} alt={cat}
                   className="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
                 <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
                   <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ backgroundColor: cfg.color }}>
                     <Ic className="w-3.5 h-3.5 text-white" />
                   </div>
                   <span className="text-white text-[9px] font-bold uppercase tracking-wider" style={mono}>{cfg.num}</span>
                 </div>
+                {active && (
+                  <div className="absolute top-2 right-2">
+                    <div className="w-5 h-5 rounded-full bg-[#B8820A] flex items-center justify-center">
+                      <CheckCircle className="w-3 h-3 text-white" />
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="bg-white flex-1 p-3 flex flex-col gap-1.5">
+              <div className="bg-white flex-1 p-3 flex flex-col gap-1">
                 <h3 className="font-semibold text-[#1A2520] text-xs leading-snug group-hover:text-[#1E3D2F] transition-colors" style={serif}>{cat}</h3>
-                <p className="text-[11px] text-[#6B6057] leading-relaxed flex-1 line-clamp-2">{desc}</p>
-                <div className="flex items-center justify-between pt-1.5 border-t border-[#F0EDE6]">
+                <p className="text-[11px] text-[#6B6057] leading-snug flex-1 line-clamp-2">{desc}</p>
+                <div className="flex items-center justify-between pt-1.5 border-t border-[#F0EDE6] mt-1">
                   <span className="text-[10px] text-[#6B6057]" style={mono}>{count} items</span>
-                  <ChevronRight className="w-3 h-3 text-[#1E3D2F]" />
+                  <ChevronRight className={`w-3 h-3 transition-colors ${active ? "text-[#B8820A]" : "text-[#1E3D2F]"}`} />
                 </div>
               </div>
             </Link>
@@ -675,47 +927,73 @@ function ResourceGrid({ resources, onAccess }: { resources: Resource[]; onAccess
     return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
   });
 
-  const title = s ? `"${s}"` : cat || (f === "free" ? "Free Material" : f === "paid" ? "Premium Packs" : "All Resources");
+  const cfg = cat ? CAT_CONFIG[cat as Category] : null;
 
   return (
     <div className="max-w-6xl mx-auto px-4 pb-14">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
-        <div className="flex items-baseline gap-2">
-          <h2 className="text-lg font-normal text-[#1A2520]" style={serif}>{title}</h2>
-          <span className="text-sm text-[#6B6057]" style={mono}>{list.length} items</span>
+      {/* Category header when filtered */}
+      {cfg && (
+        <div className="flex items-center gap-3 mb-5 pb-5 border-b border-[#DDD8CE]">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: cfg.color }}>
+            <cfg.Icon className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-lg font-normal text-[#1A2520]" style={serif}>{cat}</h2>
+            <p className="text-xs text-[#6B6057]" style={mono}>{list.length} resources found</p>
+          </div>
+          <Link to="/" className="ml-auto text-xs text-[#6B6057] hover:text-[#1E3D2F] flex items-center gap-1 transition-colors">
+            <X className="w-3 h-3" /> Clear filter
+          </Link>
         </div>
-        <div className="sm:ml-auto">
-          <select value={sort} onChange={e => setSort(e.target.value)}
-            className="border border-[#DDD8CE] rounded-lg px-3 py-2 text-sm bg-white text-[#1A2520] focus:outline-none cursor-pointer">
-            <option value="featured">Featured first</option>
-            <option value="downloads">Most Downloaded</option>
-            <option value="rating">Top Rated</option>
-            <option value="newest">Newest</option>
-            <option value="price-lo">Price: Low → High</option>
-            <option value="price-hi">Price: High → Low</option>
-          </select>
-        </div>
-      </div>
+      )}
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        {[
-          { l: "All", to: "/" }, { l: "Free", to: "/?f=free" }, { l: "Premium", to: "/?f=paid" },
-          ...CATEGORIES.map(c => ({ l: CAT_CONFIG[c].short, to: `/?c=${encodeURIComponent(c)}` })),
-        ].map(({ l, to }) => {
-          const active =
-            (l === "All"     && !s && !cat && !f) ||
-            (l === "Free"    && f === "free")      ||
-            (l === "Premium" && f === "paid")      ||
-            CATEGORIES.some(c => CAT_CONFIG[c].short === l && c === cat);
-          return (
-            <Link key={l} to={to}
-              className={`text-sm px-4 py-1.5 rounded-full border font-medium transition-all ${active
-                ? "bg-[#1E3D2F] text-white border-[#1E3D2F]"
-                : "bg-white text-[#6B6057] border-[#DDD8CE] hover:border-[#1E3D2F] hover:text-[#1E3D2F]"}`}>
-              {l}
+      {!cfg && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-lg font-normal text-[#1A2520]" style={serif}>
+              {s ? `Results for "${s}"` : f === "free" ? "Free Resources" : f === "paid" ? "Premium Packs" : "All Resources"}
+            </h2>
+            <span className="text-sm text-[#6B6057]" style={mono}>{list.length}</span>
+          </div>
+          {s && (
+            <Link to="/" className="text-xs text-[#6B6057] hover:text-[#1E3D2F] flex items-center gap-1 sm:ml-auto transition-colors">
+              <X className="w-3 h-3" /> Clear search
             </Link>
-          );
-        })}
+          )}
+        </div>
+      )}
+
+      {/* Filter + sort row */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <div className="flex flex-wrap gap-1.5 flex-1">
+          {[
+            { l: "All", to: "/" }, { l: "Free", to: "/?f=free" }, { l: "Premium", to: "/?f=paid" },
+            ...CATEGORIES.map(c => ({ l: CAT_CONFIG[c].short, to: `/?c=${encodeURIComponent(c)}` })),
+          ].map(({ l, to }) => {
+            const active =
+              (l === "All"     && !s && !cat && !f) ||
+              (l === "Free"    && f === "free")      ||
+              (l === "Premium" && f === "paid")      ||
+              CATEGORIES.some(c => CAT_CONFIG[c].short === l && c === cat);
+            return (
+              <Link key={l} to={to}
+                className={`text-xs px-3.5 py-1.5 rounded-full border font-medium transition-all ${active
+                  ? "bg-[#1E3D2F] text-white border-[#1E3D2F]"
+                  : "bg-white text-[#6B6057] border-[#DDD8CE] hover:border-[#1E3D2F]/50 hover:text-[#1E3D2F]"}`}>
+                {l}
+              </Link>
+            );
+          })}
+        </div>
+        <select value={sort} onChange={e => setSort(e.target.value)}
+          className="border border-[#DDD8CE] rounded-lg px-3 py-1.5 text-xs bg-white text-[#1A2520] focus:outline-none cursor-pointer ml-auto">
+          <option value="featured">Featured</option>
+          <option value="downloads">Most Downloaded</option>
+          <option value="rating">Top Rated</option>
+          <option value="newest">Newest</option>
+          <option value="price-lo">Price ↑</option>
+          <option value="price-hi">Price ↓</option>
+        </select>
       </div>
 
       {list.length === 0 ? (
@@ -745,8 +1023,13 @@ function StorePage({ resources }: { resources: Resource[] }) {
       <HeroSection />
       <div className="bg-[#F7F5F0]">
         {!isFiltered && <div className="border-b border-[#DDD8CE]"><HubCards resources={resources} /></div>}
-        <div className="pt-8">
-          {!isFiltered && <div className="max-w-6xl mx-auto px-4 pb-3"><SectionHeader title="All Resources" /></div>}
+        {isFiltered && (
+          <div className="max-w-6xl mx-auto px-4">
+            <HubCards resources={resources} />
+          </div>
+        )}
+        <div className="pt-4">
+          {!isFiltered && <div className="max-w-6xl mx-auto px-4 pb-2"><SectionHeader title="All Resources" /></div>}
           <ResourceGrid resources={resources} onAccess={setModal} />
         </div>
       </div>
@@ -776,7 +1059,6 @@ function ResourceDetailPage({ resources }: { resources: Resource[] }) {
 
   return (
     <div className="bg-[#F7F5F0] min-h-screen">
-      {/* Hero image */}
       <div className="relative h-52 md:h-64 overflow-hidden bg-[#EAE7DF]">
         {res.thumbnail
           ? <ImageWithFallback src={res.thumbnail} alt={res.title} className="w-full h-full object-cover" />
@@ -800,7 +1082,6 @@ function ResourceDetailPage({ resources }: { resources: Resource[] }) {
 
       <div className="max-w-5xl mx-auto px-4 py-7">
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main content */}
           <div className="lg:col-span-2 space-y-5">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded flex items-center justify-center" style={{ backgroundColor: cfg.color }}>
@@ -868,7 +1149,7 @@ function ResourceDetailPage({ resources }: { resources: Resource[] }) {
             )}
           </div>
 
-          {/* Sidebar purchase box */}
+          {/* Sticky purchase sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white border border-[#DDD8CE] rounded-2xl overflow-hidden sticky top-20 shadow-sm">
               <div className="bg-[#0C3220] px-5 py-4">
@@ -908,7 +1189,7 @@ function ResourceDetailPage({ resources }: { resources: Resource[] }) {
                 {res.type === "paid" && (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 flex gap-2">
                     <Clock className="w-4 h-4 flex-shrink-0 text-amber-600 mt-0.5" />
-                    <span>Sent to Gmail within <strong>10–15 minutes</strong> after payment. 9 AM–10 PM support.</span>
+                    <span>Sent to Gmail within <strong>10–15 minutes</strong> after payment.</span>
                   </div>
                 )}
               </div>
@@ -938,7 +1219,6 @@ function ContactPage() {
         </div>
 
         <div className="grid md:grid-cols-5 gap-6">
-          {/* Info panel */}
           <div className="md:col-span-2 space-y-4">
             <div className="rounded-2xl overflow-hidden border border-[#DDD8CE] shadow-sm">
               <div className="h-36 overflow-hidden">
@@ -947,7 +1227,7 @@ function ContactPage() {
               <div className="bg-[#0C3220] px-4 py-3 flex items-center gap-2.5">
                 <ImageWithFallback src={uafLogo} alt="UAF" className="w-8 h-8 object-contain flex-shrink-0" />
                 <div>
-                  <div className="text-white text-sm font-normal" style={serif}>UAF Notes Bank</div>
+                  <div className="text-white text-sm font-normal" style={serif}>UAF Digital Bank</div>
                   <div className="text-white/40 text-[9px] uppercase tracking-wider" style={mono}>Faisalabad, Pakistan</div>
                 </div>
               </div>
@@ -957,7 +1237,7 @@ function ContactPage() {
               <h3 className="font-normal text-[#1A2520] text-base" style={serif}>Get in Touch</h3>
               {[
                 { Icon: MessageCircle, l: "WhatsApp", v: "+92 300 1234567", href: "https://wa.me/923001234567", c: "#25D366" },
-                { Icon: Mail,          l: "Email",    v: "uafnotesbank@gmail.com", href: "mailto:uafnotesbank@gmail.com", c: "#1E3D2F" },
+                { Icon: Mail,          l: "Email",    v: "uafdigitalbank@gmail.com", href: "mailto:uafdigitalbank@gmail.com", c: "#1E3D2F" },
                 { Icon: Phone,         l: "Phone",    v: "041-9200161", href: "tel:0419200161", c: "#1E2F5A" },
                 { Icon: MapPin,        l: "Location", v: "University of Agriculture, Faisalabad", href: "#", c: "#6B3500" },
               ].map(({ Icon, l, v, href, c }) => (
@@ -987,7 +1267,6 @@ function ContactPage() {
             </div>
           </div>
 
-          {/* Form */}
           <div className="md:col-span-3">
             {sent ? (
               <div className="bg-white border border-[#DDD8CE] rounded-2xl p-10 text-center flex flex-col items-center justify-center min-h-64">
@@ -1056,15 +1335,15 @@ function ContactPage() {
 // ─── Privacy Policy Page ──────────────────────────────────────────────────────
 function PrivacyPage() {
   const sections = [
-    { title: "Information We Collect", content: "When you purchase a resource or submit material, we collect your name, Gmail address, and WhatsApp number. This information is used solely to deliver the purchased material and provide customer support. We do not collect browsing data, device fingerprints, or any tracking identifiers beyond what is standard for a web application." },
-    { title: "How We Use Your Information", content: "Your personal details are used exclusively to: (1) deliver purchased material to your Gmail address, (2) send order confirmations and delivery updates via WhatsApp, and (3) respond to your support enquiries. We do not use your information for marketing communications without your explicit consent." },
-    { title: "Payment Information", content: "UAF Notes Bank does not store payment details. Payments are made directly to our mobile wallet accounts (JazzCash, EasyPaisa) or bank account. We verify payments manually and deliver materials accordingly. No credit card or banking credentials pass through our systems." },
-    { title: "Information Sharing", content: "We do not sell, rent, or trade your personal information to any third parties. Your data is shared only with team members directly involved in order fulfilment. All team members are bound by confidentiality obligations." },
-    { title: "Data Retention", content: "Order records including your name, email, and reference number are retained for up to 12 months to resolve any delivery disputes or support requests. You may request deletion of your data by contacting us on WhatsApp or via email." },
-    { title: "Cookies & Local Storage", content: "This website may use browser local storage to remember your preferences (e.g. selected category or sort order). No third-party analytics or advertising cookies are used. You can clear this data at any time through your browser settings." },
-    { title: "Student-Submitted Content", content: "When you submit notes or past papers through the Submit page, you confirm that the material is from a legitimate university examination and shared for educational purposes only. UAF Notes Bank reviews all submissions and may decline or remove content that violates this policy." },
-    { title: "Changes to This Policy", content: "We may update this Privacy Policy occasionally. Material changes will be announced via our WhatsApp channel. Continued use of the platform after such changes constitutes acceptance of the revised policy." },
-    { title: "Contact", content: "For any privacy-related questions or data deletion requests, please contact us at uafnotesbank@gmail.com or via WhatsApp at +92 300 1234567. We will respond within 48 hours." },
+    { title: "Information We Collect", content: "When you purchase a resource or submit material, we collect your name, Gmail address, and WhatsApp number. This information is used solely to deliver the purchased material and provide customer support." },
+    { title: "How We Use Your Information", content: "Your personal details are used exclusively to deliver purchased material, send order confirmations, and respond to support enquiries. We do not use your information for marketing without your explicit consent." },
+    { title: "Payment Information", content: "UAF Digital Bank does not store payment details. Payments are made directly to our mobile wallet accounts (JazzCash, EasyPaisa) or bank account. We verify payments manually. No credentials pass through our systems." },
+    { title: "Information Sharing", content: "We do not sell, rent, or trade your personal information. Your data is shared only with team members directly involved in order fulfilment." },
+    { title: "Data Retention", content: "Order records including your name, email, and reference number are retained for up to 12 months to resolve delivery disputes. You may request deletion at any time." },
+    { title: "Cookies & Local Storage", content: "This website may use browser local storage to remember your preferences. No third-party analytics or advertising cookies are used." },
+    { title: "Student-Submitted Content", content: "When you submit notes through the Submit page, you confirm the material is from a legitimate university examination shared for educational purposes only." },
+    { title: "Changes to This Policy", content: "We may update this Privacy Policy occasionally. Continued use of the platform after changes constitutes acceptance of the revised policy." },
+    { title: "Contact", content: "For privacy-related questions or data deletion requests, contact us at uafdigitalbank@gmail.com or via WhatsApp at +92 300 1234567. We will respond within 48 hours." },
   ];
 
   return (
@@ -1085,15 +1364,13 @@ function PrivacyPage() {
           </div>
           <div>
             <h1 className="text-white text-2xl font-normal" style={serif}>Privacy Policy</h1>
-            <p className="text-white/50 text-xs mt-1" style={mono}>Last updated: July 2026 · UAF Notes Bank</p>
+            <p className="text-white/50 text-xs mt-1" style={mono}>Last updated: July 2026 · UAF Digital Bank</p>
           </div>
         </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
           <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800 leading-relaxed">
-            UAF Notes Bank is a student-run academic resource platform. We are committed to protecting your privacy and handling your data with care.
-          </p>
+          <p className="text-sm text-amber-800 leading-relaxed">UAF Digital Bank is a student-run academic resource platform. We are committed to protecting your privacy.</p>
         </div>
 
         <div className="space-y-4">
@@ -1186,7 +1463,7 @@ function AdminPage({ store }: { store: Store }) {
           </div>
           <div>
             <h1 className="text-xl font-normal text-[#1A2520]" style={serif}>Admin Dashboard</h1>
-            <p className="text-xs text-[#6B6057]">UAF Notes Bank — Resource Management</p>
+            <p className="text-xs text-[#6B6057]">UAF Digital Bank — Resource Management</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -1400,7 +1677,7 @@ function AdminPage({ store }: { store: Store }) {
                     <span className="text-[#6B6057]" style={mono}>{fmt(total)}</span>
                   </div>
                   <div className="w-full h-2 bg-[#F0EDE6] rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${max > 0 ? (total / max) * 100 : 0}%`, backgroundColor: cfg.color }} />
+                    <div className="h-full rounded-full transition-all" style={{ width: `${max > 0 ? (total / max) * 100 : 0}%`, backgroundColor: cfg.color }} />
                   </div>
                 </div>
               );
@@ -1414,8 +1691,7 @@ function AdminPage({ store }: { store: Store }) {
 
 // ─── Upload Page ──────────────────────────────────────────────────────────────
 function UploadPage() {
-  const YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
-  const [form, setForm] = useState({ name: "", agNo: "", email: "", subject: "", degree: "", category: "Past Papers", testType: "Mid-Term", year: "2025", agreed: false });
+  const [form, setForm] = useState({ name: "", agNo: "", email: "", subject: "", degree: "", category: "Past Papers", testType: "Mid-Term", agreed: false });
   const [file, setFile] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -1530,7 +1806,7 @@ function Footer() {
               <ImageWithFallback src={uafLogo} alt="UAF" className="w-full h-full object-contain" />
             </div>
             <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden p-1">
-              <ImageWithFallback src={image_cropped_circle_image__4__3} alt="Directorate" className="w-full h-full object-contain" />
+              <ImageWithFallback src={dirLogo} alt="Directorate" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="text-white text-sm font-normal" style={serif}>UAF Digital Bank</div>
@@ -1566,8 +1842,6 @@ function Footer() {
           <ul className="space-y-3 text-sm">
             <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
             <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/privacy" className="hover:text-white transition-colors">Terms of Service</Link></li>
-            <li><Link to="/privacy" className="hover:text-white transition-colors">Refund Policy</Link></li>
             <li className="pt-1 border-t border-white/5">
               <Link to="/admin" className="flex items-center gap-1.5 text-[#D4A017]/50 hover:text-[#D4A017] transition-colors">
                 <Key className="w-3.5 h-3.5" /> Developer Portal
@@ -1576,16 +1850,16 @@ function Footer() {
           </ul>
           <div className="mt-5 flex flex-col gap-2.5 text-sm">
             <a href="tel:0419200161" className="flex items-center gap-2 hover:text-white transition-colors"><Phone className="w-3.5 h-3.5 text-[#D4A017]/40" /> 041-9200161</a>
-            <a href="mailto:uafnotesbank@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors"><Mail className="w-3.5 h-3.5 text-[#D4A017]/40" /> uafdigitalbank@gmail.com</a>
+            <a href="mailto:uafdigitalbank@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors"><Mail className="w-3.5 h-3.5 text-[#D4A017]/40" /> uafdigitalbank@gmail.com</a>
           </div>
         </div>
       </div>
       <div className="border-t border-white/5 px-4 py-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="text-xs text-[#6B6057]/40">© {new Date().getFullYear()} UAF Notes Bank — Not affiliated with UAF administration.</span>
+          <span className="text-xs text-[#6B6057]/40">© {new Date().getFullYear()} UAF Digital Bank — Not affiliated with UAF administration.</span>
           <div className="flex items-center gap-4 text-xs text-[#6B6057]/30">
             <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Secure</span>
-            <span style={mono} className="text-[#D4A017]/25">v3.1</span>
+            <span style={mono} className="text-[#D4A017]/25">v3.2</span>
           </div>
         </div>
       </div>
@@ -1610,7 +1884,11 @@ function RootLayout() {
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', sans-serif" }}>
       <TopNav />
-      <main className="flex-1"><Outlet context={store} /></main>
+      <main className="flex-1">
+        <PageTransition>
+          <Outlet context={store} />
+        </PageTransition>
+      </main>
       <Footer />
     </div>
   );

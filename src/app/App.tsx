@@ -803,7 +803,7 @@ function HeroSection() {
       <div className="relative max-w-3xl mx-auto px-4 pt-9 pb-11 md:pt-11 md:pb-14 text-center bg-[#0000000a] bg-[#00000000]">
         {/* Identity strip */}
         <div className="inline-flex items-center gap-2.5 bg-white/8 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2 mb-6 bg-[#ffffff17] bg-[#ffffff24]">
-          <ImageWithFallback src={image_cropped_circle_image__8__1} alt="UAF" className="w-8 h-8 object-contain flex-shrink-0" />
+          <ImageWithFallback src={image_cropped_circle_image__8__1} alt="UAF" className="w-8 h-8 object-contain flex-shrink-0 opacity-70" />
           <span className="text-white/65 text-[11px] uppercase tracking-[0.2em]" style={mono}>University of Agriculture, Faisalabad</span>
           <ImageWithFallback src={image_cropped_circle_image__4__5} alt="" className="w-8 h-8 object-contain flex-shrink-0 opacity-70" />
         </div>

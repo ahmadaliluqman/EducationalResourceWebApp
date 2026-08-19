@@ -449,8 +449,11 @@ function TopNav() {
               <div className="w-9 h-9 flex items-center justify-center flex-shrink-0 rounded-lg overflow-hidden bg-white/8 p-0.5">
                 <ImageWithFallback src={image_cropped_circle_image__15__1} alt="UAF Logo" className="w-full h-full object-contain opacity-70" />
               </div>
+              {/* Mobile/tablet: short name only */}
+              <span className="md:hidden text-white text-[12px] font-semibold leading-tight" style={serif}>UAF Notes Hub</span>
+              {/* Desktop: full name + subtitle */}
               <div className="hidden md:block">
-                <div className="text-white text-[13px] font-semibold leading-tight tracking-tight" style={serif}>UAF Unoffical Digital Library </div>
+                <div className="text-white text-[13px] font-semibold leading-tight tracking-tight" style={serif}>UAF Unofficial Digital Library</div>
                 <div className="text-white/35 text-[9px] uppercase tracking-[0.3em]" style={mono}>Student Resource Platform</div>
               </div>
             </Link>

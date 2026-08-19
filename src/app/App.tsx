@@ -1,3 +1,7 @@
+import image_cropped_circle_image__12__2 from '@/imports/cropped_circle_image__12_-2.png'
+import image_cropped_circle_image__15__2 from '@/imports/cropped_circle_image__15_-2.png'
+import image_cropped_circle_image__15__1 from '@/imports/cropped_circle_image__15_-1.png'
+import image_cropped_circle_image__15_ from '@/imports/cropped_circle_image__15_.png'
 import image_cropped_circle_image__13__3 from '@/imports/cropped_circle_image__13_-3.png'
 import image_cropped_circle_image__14__3 from '@/imports/cropped_circle_image__14_-3.png'
 import image_cropped_circle_image__14__2 from '@/imports/cropped_circle_image__14_-2.png'
@@ -443,10 +447,10 @@ function TopNav() {
             {/* Logo + brand */}
             <Link to="/" className="flex items-center gap-3 flex-shrink-0 group">
               <div className="w-9 h-9 flex items-center justify-center flex-shrink-0 rounded-lg overflow-hidden bg-white/8 p-0.5">
-                <ImageWithFallback src={image_cropped_circle_image__14__1} alt="UAF Logo" className="w-full h-full object-contain opacity-70" />
+                <ImageWithFallback src={image_cropped_circle_image__15__1} alt="UAF Logo" className="w-full h-full object-contain opacity-70" />
               </div>
               <div className="hidden md:block">
-                <div className="text-white text-[13px] font-semibold leading-tight tracking-tight" style={serif}>UAF Notes Hub</div>
+                <div className="text-white text-[13px] font-semibold leading-tight tracking-tight" style={serif}>UAF Unoffical Digital Library </div>
                 <div className="text-white/35 text-[9px] uppercase tracking-[0.3em]" style={mono}>Student Resource Platform</div>
               </div>
             </Link>
@@ -551,7 +555,7 @@ function HeroSection() {
         <div className="flex items-center gap-4 mb-6">
           {/* Left seal */}
           <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-full bg-white/6 border border-white/18 flex items-center justify-center p-1.5 backdrop-blur-sm">
-            <ImageWithFallback src={image_cropped_circle_image__14__3} alt="UAF Logo"
+            <ImageWithFallback src={image_cropped_circle_image__15_} alt="UAF Logo"
               className="w-full h-full object-contain opacity-90" />
           </div>
 
@@ -566,9 +570,7 @@ function HeroSection() {
               <span className="text-white text-[11px] md:text-[12px] uppercase tracking-[0.25em] font-bold leading-tight">
                 Serving Students of UAF, Faisalabad
               </span>
-              <span className="text-[15px] md:text-[18px] leading-tight font-normal" style={{...urdu, color:GOLD}}>
-                طلبہ کا مطالعہ مرکز، فیصل آباد
-              </span>
+              <span className="text-[15px] md:text-[18px] leading-tight font-normal" style={{...urdu, color:GOLD}}>مرکزِ مطالعہ برائے طلبہ، جامعہ زرعیہ فیصل آباد</span>
             </div>
             <div className="h-px mt-2 opacity-30" style={{background:`linear-gradient(90deg, ${GOLD}, transparent)`}} />
           </div>
@@ -1669,10 +1671,10 @@ function Footer() {
         <div className="lg:col-span-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-white/6 border border-white/10 flex items-center justify-center overflow-hidden p-1">
-              <ImageWithFallback src={image_cropped_circle_image__14__2} alt="UAF" className="w-full h-full object-contain opacity-65"/>
+              <ImageWithFallback src={image_cropped_circle_image__15__2} alt="UAF" className="w-full h-full object-contain opacity-65"/>
             </div>
             <div className="w-10 h-10 rounded-xl bg-white/6 border border-white/10 flex items-center justify-center overflow-hidden p-1">
-              <ImageWithFallback src={image_cropped_circle_image__13__3} alt="UAF Seal" className="w-full h-full object-contain opacity-65"/>
+              <ImageWithFallback src={image_cropped_circle_image__12__2} alt="UAF Seal" className="w-full h-full object-contain opacity-65"/>
             </div>
           </div>
           <div className="text-white text-base font-normal mb-1" style={serif}>UAF Digital Bank</div>
